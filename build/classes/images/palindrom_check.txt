@@ -1,0 +1,115 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package laba_1_final;
+
+import java.util.Random;
+import java.io.*;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.UUID;
+
+/**
+ *
+ * @author Руслан
+ */
+
+public class Laba_1_final 
+{
+    static String alf = new String("йцукенгшщзхъфывапролджэячсмитьбю"); //словообразующая строка
+    static String txt = new String(""); //с ней будем работать в дальнейшем, для удобства форматирования
+    static int kolvo = 0; //кол-во палиндромов
+        
+        public static void main(String[] args) throws IOException
+    {
+        dialog();
+    }
+    
+    public static void dialog() //вводный метод, формирующий запросы для "рабочих" методов
+    {
+        try
+     {  Scanner scan= new Scanner(System.in);
+        System.out.print("ПОИСК СЛОВ-ПАЛИНДРОМОВ В ТЕКСТЕ\nСколько слов будет в тексте? (от 10 до ~)  ");
+        int wordscount= scan.nextInt();
+        if(wordscount<10) { System.out.println(); throw new IllegalArgumentException("СЛИШКОМ МАЛОЕ КОЛ-ВО СЛОВ В ТЕКСТЕ\n"); }
+        System.out.print("Какова фиксированная длина слова?   (от 2 до ~)   ");
+        int wordsleng= scan.nextInt();
+        if(wordsleng<2) { System.out.println();   throw new IllegalArgumentException("СЛИШКОМ МАЛАЯ ДЛИНА СЛОВ\n"); }
+        int leng = alf.length();
+        
+        textwriter(leng, wordsleng, wordscount);                      //сформировали в txt наш текст
+        StringBuilder strbldr = new StringBuilder(txt);               //чтобы при тексте в 300+ слов не захламлять консоль вывода
+        System.out.println("\nСгенерированный текст в изначальном виде: (вывод только ста первых элементов)\n"+strbldr.substring(0, 100)+"\n");
+        System.out.println("Отформатированный текст:\n" + formatting(txt, wordsleng, wordscount));
+        if(engine(txt, wordsleng).compareTo("")==0){ System.out.println("Не обнаружено слов–палиндромов в тексте! :С"); }
+        else                                       { System.out.println("Обнаруженные слова–палиндромы:\n"+engine(txt, wordsleng) + "Кол-во найденных слов–палиндромов: "+kolvo); }
+     }
+        catch(Exception e) { System.out.print(e);System.out.println(); }
+    }
+        
+    public static void textwriter(int leng, int wordsleng, int wordscount)  //формирование текста без пробелов и <enter>-ов
+    {
+        Random rand = new Random();
+        char[] arr = new char[wordsleng*wordscount];
+        for(int i=0; i<arr.length; i++)
+        {
+            txt+= alf.charAt(rand.nextInt(alf.length()));
+        }
+    }
+    
+    public static String formatting(String str, int wordsleng, int wordscount) //форматирование текста для чел. глаза
+    {
+        char[] arr = new char[wordsleng*wordscount+wordscount];
+        char[] arr2 = str.toCharArray();
+        int j=0; int k=0;
+        for(int i=0; i<arr.length; i++)
+        {
+            arr[i]=arr2[k]; 
+            k++; j++;
+            if(j!=0&&j!=arr.length&&j%((wordsleng)*25)== 0) { arr[i+1]+='\n'; i++;} 
+            else if(j!=0&&j!=arr.length&&j%(wordsleng) == 0) { arr[i+1]+=' '; i++;}
+        }
+        return new String(arr);
+    }
+    
+    public static String engine(String text, int wordsleng)  //"рабочий" метод => поиск палиндромов и их подсчёт
+    {
+        String res = new String("");   //результирующая переменная
+        String used = "";              //строка исключения
+        String str="";                 //наше "рабочее пространство" для сравнения слов текста
+        char[] textarr = text.toCharArray();
+        int arrleng = textarr.length;
+        
+        for(int i=0; i<arrleng; i++)
+        {
+            str += textarr[i];
+            if(str.length()>=wordsleng)
+            {   
+                StringBuilder bd = new StringBuilder(str);
+                if(str.compareTo(bd.reverse().toString()) == 0) 
+                    {
+                        if(used.contains(bd.toString())==false)
+                        res += bd.toString() + "\n";
+                        used+=bd.toString() + " ";
+                        kolvo++;
+                    }
+                
+                str = "";
+            }
+        }        
+        return res;
+    }
+}
+
+
+//        int leng = alf.length();
+//        int wordsleng = 4;
+//        int wordscount = 700;
+//        textwriter(leng, wordsleng, wordscount);
+//        StringBuilder strbldr = new StringBuilder(txt);
+//        System.out.println("Сгенерированный текст в изначальном виде: (выведу только 100 первых элементов)\n"+strbldr.substring(0, 100)+"\n");
+//        System.out.println("Отформатированный текст:\n" + formatting(txt, wordsleng, wordscount));
+//        if(engine(txt, wordsleng).compareTo("")==0){ System.out.println("Не обнаружено слов–палиндромов в тексте! :С"); }
+//        else                                       { System.out.println("Обнаруженные слова– палиндромы:\n"+engine(txt, wordsleng) + "Кол-во найденных слов–палиндромов: "+kolvo); }
